@@ -1,11 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
 import AuthContext from '../context/AuthContext';
 import BookingsList from '../components/Bookings/BookingsList/BookingsList';
+import BookingsChart from '../components/Bookings/BookingsChart/BookingsChart';
+import BookingsControls from '../components/Bookings/BookingsControls/BookingsControls';
 
 const Bookings = () => {
   const authContext = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
   const [bookings, setBookings] = useState([]);
+  const [outputType, setOutputType] = useState('list');
 
   useEffect(() => {
     const getBookings = async () => {
@@ -26,6 +29,7 @@ const Bookings = () => {
                 _id
                 title
                 date
+                price
             }
           }
         }
@@ -104,6 +108,14 @@ const Bookings = () => {
       });
   };
 
+  const changeOutputTypeHandler = (type) => {
+    if (type === 'list') {
+      setOutputType('list');
+    } else {
+      setOutputType('chart');
+    }
+  };
+
   return (
     <>
       {isLoading ? (
@@ -113,9 +125,24 @@ const Bookings = () => {
           </div>
         </div>
       ) : (
-        <ul>
-          {<BookingsList bookings={bookings} onDelete={deleteBookingHandler} />}
-        </ul>
+        <>
+          <BookingsControls
+            activeOutputType={outputType}
+            onChangeType={changeOutputTypeHandler}
+          />
+          <div>
+            {outputType === 'list' ? (
+              <ul>
+                <BookingsList
+                  bookings={bookings}
+                  onDelete={deleteBookingHandler}
+                />
+              </ul>
+            ) : (
+              <BookingsChart bookings={bookings} />
+            )}
+          </div>
+        </>
       )}
     </>
   );
